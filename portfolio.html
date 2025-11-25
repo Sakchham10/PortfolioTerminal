@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sakchham Sangroula | Software Engineer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- JetBrains Mono Font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { font-family: 'JetBrains Mono', monospace; margin: 0; background-color: #1d2021; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #282828; }
+        ::-webkit-scrollbar-thumb { background: #a89984; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d79921; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Icons (Inline SVGs to avoid dependency issues) ---
+        const TerminalIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        );
+        const GithubIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        );
+        const LinkedinIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+        );
+        const MailIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        );
+        const CpuIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+        );
+        const DatabaseIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+        );
+        const ExternalLinkIcon = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        );
+        const ChevronRight = ({ size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="9 18 15 12 9 6"></polyline></svg>
+        );
+
+        const App = () => {
+            const RESUME_DATA = {
+                name: "Sakchham Sangroula",
+                role: "Software Engineer",
+                contact: {
+                    email: "ssangroula010@gmail.com",
+                    linkedin: "linkedin.com/in/sakchham-10",
+                    github: "github.com/Sakchham10"
+                },
+                education: [
+                    { school: "University of The Cumberlands", degree: "M.S. Computer Science", date: "Aug 2025" },
+                    { school: "University of North Texas", degree: "B.S. Computer Science", date: "May 2023" }
+                ],
+                experience: [
+                    {
+                        company: "Trimble",
+                        role: "Software Engineer",
+                        date: "March 2024 - Present",
+                        details: [
+                            "Developed LLM-based AI chat app with RAG pipeline (C#/.NET, Angular, AWS).",
+                            "Architected inter-service communication using RabbitMQ, reducing latency by 50%.",
+                            "Enhanced CI/CD pipeline implementing testing in Linux environments.",
+                            "Built real-time route feedback features using RESTful APIs and Redis.",
+                            "Optimized SQL queries ensuring feature parity across distributed systems."
+                        ]
+                    },
+                    {
+                        company: "Plasma Business Intelligence",
+                        role: "Full Stack Engineer Intern",
+                        date: "May 2022 - Aug 2022",
+                        details: [
+                            "Integrated NGXS state management in Angular, improving API efficiency by 30%.",
+                            "Constructed full-scale frontend dashboards for trend visualization.",
+                            "Refactored Docker containerization files, accelerating rebuild times."
+                        ]
+                    },
+                    {
+                        company: "WeCare Insurance",
+                        role: "Software Engineer Intern",
+                        date: "May 2021 - Aug 2021",
+                        details: [
+                            "Developed dashboards using Typescript and Angular for metrics tools.",
+                            "Accelerated data retrieval speed by 300% through algorithm optimization."
+                        ]
+                    }
+                ],
+                projects: [
+                    {
+                        name: "AFor You (iOS AI Learning App)",
+                        tech: "Swift, Firebase, Gemini AI",
+                        desc: "Engineered an iOS application to assist high school students with AI-powered problem solving. Integrated Gemini API for 95% accuracy in context-aware answers and implemented progress analytics features to monitor academic strengths via data visualization.",
+                        link: "https://github.com/Sakchham10" 
+                    },
+                    {
+                        name: "Custom Interpreter",
+                        tech: "C",
+                        desc: "Built a complete language front-end with a custom scanner, parser, and Virtual Machine from scratch. Features include bytecode interpretation, garbage collection, and a dynamic typing system with low-level memory optimization.",
+                        link: "https://github.com/Sakchham10/CLOX"
+                    }
+                ],
+                skills: {
+                    languages: ["Python", "C#", "Java", "JavaScript", "TypeScript", "HTML", "SQL", "C", "Swift"],
+                    frameworks: [".NET", "Angular", "React", "SwiftUI", "LangChain", "RAG"],
+                    tools: ["Git", "AWS", "Docker", "Postman", "XCode", "Linux", "RabbitMQ", "Redis"],
+                    databases: ["MySQL", "MongoDB"]
+                }
+            };
+
+            const StatusBar = () => {
+                const [time, setTime] = useState(new Date());
+
+                useEffect(() => {
+                    const timer = setInterval(() => setTime(new Date()), 1000);
+                    return () => clearInterval(timer);
+                }, []);
+
+                const formatTime = (date) => {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                };
+
+                return (
+                    <div className="w-full h-8 bg-[#282828] flex justify-between items-center px-2 text-sm font-bold select-none border-b-2 border-[#3c3836] text-[#ebdbb2]">
+                        <div className="flex items-center space-x-4">
+                            <div className="flex space-x-1">
+                                <span className="text-[#458588]">1</span>
+                                <span className="text-[#a89984]">2</span>
+                                <span className="text-[#a89984]">3</span>
+                                <span className="text-[#a89984]">4</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[#d79921]"></span>
+                                <span className="text-[#ebdbb2]">arch</span>
+                            </div>
+                            <span className="text-[#a89984]">|</span>
+                            <span className="text-[#689d6a]">sakchham@portfolio</span>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-2 text-xs md:text-sm">
+                                <div className="flex items-center gap-1">
+                                    <CpuIcon size={14} className="text-[#b16286]" />
+                                    <span className="text-[#b16286]">CPU: 12%</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <DatabaseIcon size={14} className="text-[#98971a]" />
+                                    <span className="text-[#98971a]">RAM: 2.4G</span>
+                                </div>
+                            </div>
+                            <div className="bg-[#d79921] text-[#1d2021] px-2 py-0.5 rounded-sm">
+                                {formatTime(time)}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const Neofetch = () => {
+                return (
+                    <div className="flex flex-col md:flex-row gap-6 pb-6 border-b border-[#504945]">
+                        <div className="hidden md:block text-[#458588] whitespace-pre font-bold select-none leading-tight text-xs lg:text-sm">
+{`
+      /\\
+     /  \\
+    /    \\
+   /      \\
+  /   ,,   \\
+ /   |  |   \\
+/_-''    ''-_\\
+`}
+                        </div>
+                        <div className="flex flex-col justify-center text-sm w-full">
+                            <div className="mb-2">
+                                <h1 className="text-[#d79921] font-bold text-2xl">Sakchham Sangroula</h1>
+                            </div>
+                            <div className="w-full h-[1px] bg-gray-600 mb-3"></div>
+                            
+                            <div className="mb-4 text-[#ebdbb2] italic max-w-xl">
+                                Software Engineer specializing in distributed systems, LLM integrations, and full-stack development with .NET & Angular. Passionate about low-level OS architecture and compiler design.
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-y-1 text-sm">
+                                <div className="flex items-center gap-2"><span className="text-[#458588] font-bold w-24 inline-block">Role</span><span className="text-[#ebdbb2]">{RESUME_DATA.role}</span></div>
+                                <div className="flex items-center gap-2"><span className="text-[#458588] font-bold w-24 inline-block">Education</span><span className="text-[#ebdbb2]">M.S. CS @ Cumberlands</span></div>
+                                
+                                <div className="mt-2"></div>
+                                
+                                <div className="flex items-center gap-2">
+                                    <MailIcon size={14} className="text-[#fb4934]" />
+                                    <span className="text-[#fb4934] font-bold w-20 inline-block">Email</span>
+                                    <a href={`mailto:${RESUME_DATA.contact.email}`} className="text-[#83a598] hover:underline hover:text-[#d79921] transition-colors">{RESUME_DATA.contact.email}</a>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <GithubIcon size={14} className="text-[#fb4934]" />
+                                    <span className="text-[#fb4934] font-bold w-20 inline-block">GitHub</span>
+                                    <a href={`https://${RESUME_DATA.contact.github}`} target="_blank" rel="noreferrer" className="text-[#83a598] hover:underline hover:text-[#d79921] transition-colors">Sakchham10</a>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <LinkedinIcon size={14} className="text-[#fb4934]" />
+                                    <span className="text-[#fb4934] font-bold w-20 inline-block">LinkedIn</span>
+                                    <a href={`https://${RESUME_DATA.contact.linkedin}`} target="_blank" rel="noreferrer" className="text-[#83a598] hover:underline hover:text-[#d79921] transition-colors">sakchham-10</a>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-4 flex gap-2">
+                                <span className="w-4 h-4 bg-[#cc241d]"></span>
+                                <span className="w-4 h-4 bg-[#98971a]"></span>
+                                <span className="w-4 h-4 bg-[#d79921]"></span>
+                                <span className="w-4 h-4 bg-[#458588]"></span>
+                                <span className="w-4 h-4 bg-[#b16286]"></span>
+                                <span className="w-4 h-4 bg-[#689d6a]"></span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const SectionHeader = ({ title, path }) => (
+                <div className="flex items-center gap-2 mb-4 mt-8">
+                    <span className="text-[#98971a] font-bold">➜</span>
+                    <span className="text-[#689d6a] font-bold">~/{path}</span>
+                    <span className="text-[#a89984] text-sm"># {title}</span>
+                </div>
+            );
+
+            return (
+                <div className="h-screen w-screen flex flex-col bg-[#1d2021] text-[#ebdbb2] font-mono overflow-hidden">
+                    <StatusBar />
+                    
+                    {/* Terminal Window Container */}
+                    <div className="flex-1 p-4 md:p-8 overflow-hidden flex justify-center">
+                        <div className="w-full max-w-5xl h-full bg-[#282828] border-2 border-[#504945] rounded shadow-2xl flex flex-col overflow-hidden relative">
+                            
+                            {/* Window Title Bar */}
+                            <div className="bg-[#3c3836] px-4 py-2 flex items-center justify-between border-b border-[#504945] shrink-0">
+                                <div className="text-sm text-[#a89984] font-bold flex items-center gap-2">
+                                    <TerminalIcon size={14} />
+                                    Sakchham Sangroula
+                                </div>
+                                <div className="flex space-x-2">
+                                    <div className="w-3 h-3 rounded-full bg-[#cc241d]"></div>
+                                    <div className="w-3 h-3 rounded-full bg-[#d79921]"></div>
+                                    <div className="w-3 h-3 rounded-full bg-[#98971a]"></div>
+                                </div>
+                            </div>
+
+                            {/* Scrollable Content Area */}
+                            <div className="flex-1 overflow-y-auto p-6 font-mono text-sm md:text-base">
+                                
+                                <Neofetch />
+
+                                {/* Experience Section */}
+                                <SectionHeader title="Work Experience" path="experience" />
+                                <div className="space-y-8 pl-4 border-l border-[#504945] ml-2">
+                                    {RESUME_DATA.experience.map((job, idx) => (
+                                        <div key={idx} className="relative">
+                                            <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#d79921]"></div>
+                                            <div className="flex flex-wrap justify-between items-baseline mb-1">
+                                                <h3 className="text-[#d79921] font-bold text-lg flex items-center gap-2">
+                                                    {job.role}
+                                                </h3>
+                                                <span className="text-[#a89984] text-sm font-bold">[{job.date}]</span>
+                                            </div>
+                                            <div className="text-[#458588] font-semibold mb-2">@{job.company}</div>
+                                            <ul className="text-sm text-[#ebdbb2] space-y-2">
+                                                {job.details.map((detail, i) => (
+                                                    <li key={i} className="flex items-start gap-2">
+                                                        <ChevronRight size={14} className="text-[#fabd2f] mt-1 shrink-0" />
+                                                        <span className="leading-relaxed">{detail}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Projects Section */}
+                                <SectionHeader title="Projects" path="projects" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {RESUME_DATA.projects.map((proj, idx) => (
+                                        <a 
+                                            key={idx} 
+                                            href={proj.link} 
+                                            target="_blank" 
+                                            rel="noreferrer"
+                                            className="block border border-[#504945] p-4 rounded bg-[#32302f] hover:border-[#d79921] hover:bg-[#3c3836] transition-all cursor-pointer group relative overflow-hidden"
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[#98971a] group-hover:text-[#b8bb26] transition-colors">➜</span>
+                                                    <h3 className="text-[#d79921] font-bold group-hover:text-[#fabd2f] decoration-dashed underline underline-offset-4 transition-colors">{proj.name}</h3>
+                                                </div>
+                                                <ExternalLinkIcon size={14} className="text-[#a89984] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </div>
+                                            <p className="text-xs text-[#b16286] mb-3 font-bold border-b border-[#504945] pb-1 inline-block">[{proj.tech}]</p>
+                                            <p className="text-sm text-[#ebdbb2] leading-relaxed">{proj.desc}</p>
+                                        </a>
+                                    ))}
+                                </div>
+
+                                {/* Skills Section */}
+                                <SectionHeader title="Technical Skills" path="bin/skills" />
+                                <div className="space-y-6 pl-2 mb-8">
+                                    <div>
+                                        <span className="text-[#fb4934] font-bold border-b-2 border-[#fb4934] mb-3 inline-block pb-1">Languages</span>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {RESUME_DATA.skills.languages.map(s => (
+                                                <span key={s} className="bg-[#32302f] px-2 py-1 rounded text-sm text-[#8ec07c] border border-[#504945] hover:border-[#8ec07c] transition-colors cursor-default">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-[#d79921] font-bold border-b-2 border-[#d79921] mb-3 inline-block pb-1">Frameworks</span>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {RESUME_DATA.skills.frameworks.map(s => (
+                                                <span key={s} className="bg-[#32302f] px-2 py-1 rounded text-sm text-[#fabd2f] border border-[#504945] hover:border-[#fabd2f] transition-colors cursor-default">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-[#d3869b] font-bold border-b-2 border-[#d3869b] mb-3 inline-block pb-1">Tools & DB</span>
+                                        <div className="flex flex-wrap gap-2 mt-1">
+                                            {[...RESUME_DATA.skills.tools, ...RESUME_DATA.skills.databases].map(s => (
+                                                <span key={s} className="bg-[#32302f] px-2 py-1 rounded text-sm text-[#d3869b] border border-[#504945] hover:border-[#d3869b] transition-colors cursor-default">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Command Line at the bottom (Visual only) */}
+                                <div className="mt-8 pt-4 border-t border-[#504945] flex items-center gap-2 opacity-75">
+                                    <span className="text-[#98971a] font-bold">➜</span>
+                                    <span className="text-[#689d6a] font-bold">~</span>
+                                    <span className="text-[#ebdbb2] animate-pulse font-bold">_</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
